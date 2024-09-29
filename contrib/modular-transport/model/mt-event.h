@@ -35,6 +35,8 @@ class MTEvent {
         EventSubtype subtype;
         long time;
         flow_id flowId;
+        const std::string typeString;
+        virtual EventType getType() { return type; }
 
         // used as key in event processor's eventMap
         std::string name;
@@ -42,7 +44,8 @@ class MTEvent {
         MTEvent(EventType type, 
                 EventSubtype subtype,
                 long time, 
-                flow_id flowId);
+                flow_id flowId,
+                std::string typeString = "");
         virtual ~MTEvent();
 };
 

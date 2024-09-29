@@ -2,28 +2,30 @@
 #define MT_SCHEDULER_H
 
 #include <vector>
+#include <queue>
 #include "../helper/mtp-types.h"
 #include "mt-event.h"
 
 namespace ns3 {
   class queue_set {
+    // queue set
+    queue_t<MTEvent *>    appQueue;
+    queue_t<MTEvent *>    netQueue;
+    queue_t<MTEvent *>   progQueue;
+    queue_t<MTEvent *> urgentQueue;
+    queue_t<MTEvent *>  timerQueue;
+    queue_t<MTEvent *>    memQueue;
+
     public:
-      // queue set
-      queue_t<event_t *>    appQueue;
-      queue_t<event_t *>    netQueue;
-      queue_t<event_t *>   progQueue;
-      queue_t<event_t *> urgentQueue;
-      queue_t<event_t *>  timerQueue;
-      queue_t<event_t *>    memQueue;
+      int total_queues;
 
-      // used when selecting for round-robin scheduling
-      std::vector<queue_t<event_t *> *> queues;
+      void enqueue_event(MTEvent * event);
+      queue_t<MTEvent *> get_queue(int selector);
+      void pop_queue(int selector);
+      bool is_empty();
 
-      void enqueue_event(event_t * event);
-
-      queue_set();
-      ~queue_set();
-  };
+      queue_set(int lower_limit, int upper_limit, bool (*drop_policy)(MTEvent *));
+  }; 
 
   class MTScheduler {
     // need to initialize queues (with lower limit, upper limit and drop policy) when pushing
@@ -34,19 +36,20 @@ namespace ns3 {
     unsigned int flowSelector;
 
     public:
-      MTScheduler();
-      ~MTScheduler();
+      MTScheduler(int lower_limit, int upper_limit, bool (*drop_policy)(MTEvent *));
+      ~MTScheduler(){}
 
       // used to store data from packets belonging to this flow while they are being processed
-      flow_map<stream> transitoryMemory;
+      //flow_map<stream> transitoryMemory;
 
-      void enqueue_event(flow_id id, event_t * event);
-      virtual void initialize();
+      void enqueue_event(flow_id id, MTEvent * event);
+      void initialize();
       flow_id next_flow();
-      event_t * next_event(flow_id id);
+      MTEvent * next_event_by_id(flow_id id);
+
+      bool is_empty();
  
-      friend event_t * get_next_event(MTScheduler * scheduler);
-      friend void enqueue_event(flow_map<queue_set> flowMap, flow_id id, event_t * event);
+      MTEvent * get_next_event();
   };
 }
 

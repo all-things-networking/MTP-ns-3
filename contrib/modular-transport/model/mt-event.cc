@@ -2,11 +2,12 @@
 
 namespace ns3 {
 
-  MTEvent::MTEvent(EventType type, EventSubtype subtype, long time, flow_id flowId):
+  MTEvent::MTEvent(EventType type, EventSubtype subtype, long time, flow_id flowId, std::string typeString):
     type{type},
     subtype{std::move(subtype)},
     time{time},
-    flowId{flowId}
+    flowId{flowId},
+    typeString{typeString}
     {
       if (type == EventType::INCOMING && (subtype != EventSubtype::APP_EVENT || subtype != EventSubtype::NET_EVENT)) {
         throw std::runtime_error("Invalid subtype for incoming event");

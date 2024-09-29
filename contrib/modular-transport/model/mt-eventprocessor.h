@@ -13,7 +13,7 @@ class MTContext;
 class Packet;
 
 struct EventProcessorOutput {
-    std::vector<MTEvent*> events;
+    std::vector<MTEvent *> events;
     MTContext* ctx;
     std::vector<Packet> packets;
     // TODO: Add tx_module
@@ -23,7 +23,6 @@ struct EventProcessorOutput {
 /**
  * \brief The base class for event processor. This is virtual class.
  */
-struct EventProcessorOutput;
 class MTEventProcessor
 {
 public:

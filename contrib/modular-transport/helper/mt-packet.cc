@@ -14,6 +14,11 @@ namespace ns3 {
     delete[] data;
   }
 
+  void pkt_t::add_data(uint8_t * newData, int size) {
+    Packet toAdd = Packet(newData, size);
+    AddAtEnd(Ptr<Packet>(&toAdd));
+  }
+
   void pkt_t::get_data(uint8_t * outputBuffer, int bytesToCopy) { 
     CopyData(outputBuffer, bytesToCopy);
   }

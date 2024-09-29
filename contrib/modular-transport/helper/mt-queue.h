@@ -26,6 +26,7 @@ namespace ns3 {
       bool unpause();
       void active();
       void push(event e);
+      bool empty();
       event pop();
   };
 

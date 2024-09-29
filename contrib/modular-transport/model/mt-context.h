@@ -15,6 +15,7 @@ class ModularTransport;
 class MTContext{
 public:
     MTContext();
+    int flow_id;
 
     // to ensure the class is abstract/not instantiable
     virtual ~MTContext() = 0;

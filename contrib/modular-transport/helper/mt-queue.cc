@@ -6,8 +6,19 @@ namespace ns3 {
       upper_limit{upper_limit},
       lower_limit{lower_limit},
       drop_policy{drop_policy},
+      appQueue(lower_limit, upper_limit, drop_policy),
+      netQueue(lower_limit, upper_limit, drop_policy),
+      progQueue(lower_limit, upper_limit, drop_policy),
+      urgentQueue(lower_limit, upper_limit, drop_policy),
+      timerQueue(lower_limit, upper_limit, drop_policy),
+      memQueue(lower_limit, upper_limit, drop_policy)
       paused{false}
     {}
+
+    template<typename event>
+    bool queue_t<event>::empty() {
+      return eventQueue.empty(); 
+    }
 
     template<typename event>
     queue_t<event>::queue_t():

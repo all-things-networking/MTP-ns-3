@@ -2,10 +2,17 @@
 #ifndef MODULAR_TRANSPORT_H
 #define MODULAR_TRANSPORT_H
 
-#include "mt-header.h"
-
+#include "mt-rxapp.h"
+#include "mt-txnet.h"
+#include "mt-rxnet.h"
+#include "mt-scheduler.h"
+#include "mt-dispatcher.h"
+#include "mt-context.h"
+#include "../helper/mtp-types.h"
+#include "mt-eventprocessor.h"
 #include "ns3/ip-l4-protocol.h"
-
+#include "ns3/ipv4-l3-protocol.h"
+#include "ns3/node.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/sequence-number.h"
@@ -38,18 +45,30 @@ class ModularTransport: public IpL4Protocol
      */
     void SetNode(Ptr<Node> node);
 
+    void Start(
+               const Ipv4Address& saddr,
+               const Ipv4Address& daddr/*,
+               MTContext* StartContext*/);
+
+    void ReceiveAppMessage(const Ipv4Address& saddr,const Ipv4Address& daddr);
+    void ReceiveNetPacket(const Ipv4Address& saddr,const Ipv4Address& daddr);
+    /**
+    main of simulation
+    */
+    void Mainloop();
+
      /**
      * \brief Send a packet
      *
      * \param pkt The packet to send
-     * \param outgoing The packet header
      * \param saddr The source Ipv4Address
      * \param daddr The destination Ipv4Address
      */
     void SendPacket(Ptr<Packet> pkt,
-                    const MTHeader& outgoing,
                     const Ipv4Address& saddr,
                     const Ipv4Address& daddr) const; 
+
+    void HandleTimeout(MTEvent* ev);
 
     // From IpL4Protocol
     enum IpL4Protocol::RxStatus Receive(Ptr<Packet> p,
@@ -83,6 +102,9 @@ class ModularTransport: public IpL4Protocol
     IpL4Protocol::DownTargetCallback GetDownTarget() const override;
     IpL4Protocol::DownTargetCallback6 GetDownTarget6() const override;
 
+    virtual MTContext* InitContext(flow_id fid){return NULL;}
+
+    virtual void print_debugging_info(flow_id fid){}
   protected:
     void DoDispose() override;
 
@@ -96,8 +118,19 @@ class ModularTransport: public IpL4Protocol
      * linking it to the ipv4 or ipv6 and setting up other relevant state.
      */
     void NotifyNewAggregate() override;
+    MTRXAppParser* rxapp;
+    MTTXNetScheduler* txnet;
+    MTRXNetParser* rxnet;
+    MTScheduler* scheduler;
+    MTDispatcher* dispatcher;
+    MTIntermediateOutput* interm_output;
+    flow_map<MTContext*> ctx_table;
+    bool drop_policy(MTEvent * event);
+    int lower_limit = 0, upper_limit = 10000; // for queue_t in scheduler types
 
   private:
+    // MTDispatcher* dispatcher;
+    // MTReceiver* receiver;
     Ptr<Node> m_node;                                //!< the node this stack is associated with
     IpL4Protocol::DownTargetCallback m_downTarget;   //!< Callback to send packets over IPv4
     IpL4Protocol::DownTargetCallback6 m_downTarget6; //!< Callback to send packets over IPv6

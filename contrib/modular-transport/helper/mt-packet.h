@@ -21,6 +21,7 @@ namespace ns3 {
       int len();
 
       void add_data(Buffer newData);
+      void add_data(uint8_t * newData, int size);
 
       // copies bytesToCopy bytes (ideally pkt_t::len()) from the packet's 
       // buffer to outputBuffer, which should be preallocated

@@ -29,6 +29,10 @@ namespace ns3 {
         }
         return flowMap[key];
       }
+      
+      int size(){
+        return flowMap.size();
+      }
   };
 }
 
